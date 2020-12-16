@@ -16,21 +16,29 @@ func main() {
 	args := os.Args[1:]
 	t := args[0]
 	command := args[1:]
-	timeInSeconds := getTimeInSeconds(t)
-	time.Sleep(timeInSeconds)
+
+	time.Sleep(parseTime(t))
 	cmd := exec.Command(command[0], command[1:]...)
 	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stderr
-	cmd.Start()
+	cmd.Stdout = os.Stdout
+	_ = cmd.Start()
 }
 
-func getTimeInSeconds(t string) time.Duration {
+func parseTime(t string) time.Duration {
 	t = strings.ToLower(t)
 	if strings.HasSuffix(t, "s") {
 		parsedTime, _ := strconv.Atoi(strings.TrimSuffix(t, "s"))
 		return time.Duration(parsedTime) * time.Second
 	}
-	return 1 * time.Second
+	if strings.HasSuffix(t, "m") {
+		parsedTime, _ := strconv.Atoi(strings.TrimSuffix(t, "m"))
+		return time.Duration(parsedTime) * time.Minute
+	}
+	if strings.HasSuffix(t, "h") {
+		parsedTime, _ := strconv.Atoi(strings.TrimSuffix(t, "h"))
+		return time.Duration(parsedTime) * time.Hour
+	}
+	return time.Second
 }
 
 func fatal(message string) {
